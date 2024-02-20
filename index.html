@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Web Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+
+        #chatbox {
+            border: 1px solid #ddd;
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        #inputBox {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        #userInput {
+            flex-grow: 1;
+            padding: 5px;
+        }
+
+        #sendBtn {
+            padding: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>ChatGPT Web Application</h2>
+
+    <div id="chatbox"></div>
+
+    <div id="inputBox">
+        <input type="text" id="userInput" placeholder="Type your message...">
+        <button onclick="sendMessage()" id="sendBtn">Send</button>
+    </div>
+
+    <script>
+        const chatbox = document.getElementById("chatbox");
+        const userInput = document.getElementById("userInput");
+
+        function sendMessage() {
+            const userMessage = userInput.value;
+            displayMessage('user', userMessage);
+
+            // Make a request to the server (you need a server to handle OpenAI API requests)
+            // Replace 'YOUR_OPENAI_API_KEY' with your actual OpenAI API key
+            const openaiApiKey = 'YOUR_OPENAI_API_KEY';
+            const apiUrl = 'https://api.openai.com/v1/engines/davinci-codex/completions';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiApiKey}`
+                },
+                body: JSON.stringify({
+                    prompt: userMessage,
+                    max_tokens: 100
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const chatGPTResponse = data.choices[0].text.trim();
+                displayMessage('chatGPT', chatGPTResponse);
+            })
+            .catch(error => console.error('Error:', error));
+
+            userInput.value = '';
+        }
+
+        function displayMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `${sender}: ${message}`;
+
+            chatbox.appendChild(messageElement);
+
+            // Scroll to the bottom to show the latest message
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
